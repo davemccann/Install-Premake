@@ -16,6 +16,7 @@ inputs:
   premakeFilepath:
     description: '[Optional] The file location of a premake configuration script to use'
     default: ''
-  runs:
-    using: 'node22'
-    main: 'dist/index.js'
+  
+runs:
+  using: 'node22'
+  main: 'dist/index.js'

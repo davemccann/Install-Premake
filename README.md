@@ -5,7 +5,7 @@ This action performs the setup and calling of [Premake](https://github.com/prema
 ## Usage
 
 ```yaml
-- uses: davemccann/PremakeCI@v0.3.0
+- uses: davemccann/PremakeCI@v0.3.1
   with:
     version: '5.0.0-beta3'
     action: vs2022
