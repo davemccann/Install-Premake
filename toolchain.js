@@ -1,20 +1,25 @@
-const tc = require('@actions/tool-cache')
-const { execFile } = require('child_process')
+const tc = require('@actions/tool-cache');
+const path = require('node:path');
+const { execFile } = require('child_process');
 
-async function extractArchive(zipPath, outputDir) {	
-	if (process.platform === 'win32') {
-		return await tc.extractZip(zipPath, outputDir);
+const archiveExtractorMappings = {
+	'.zip': tc.extractZip,
+	'.7z': tc.extract7z,
+	'.pkg': tc.extractXar,
+	'.tar': tc.extractTar,
+	'.gz': tc.extractTar,
+	'.tgz': tc.extractTar,
+};
+
+async function extractArchive(filepath, outputPath) {
+	const extension = path.extname(filepath);
+	
+	const extractor = archiveExtractorMappings[extension];
+	if (!extractor) {
+		throw new Error(`failed to extract archive, unsupported file format: ${extension}`);
 	}
-	else if (process.platform === 'darwin') {
-		return await tc.extractXar(zipPath, outputDir);
-	}
-	else if (process.platform === 'linux') {
-		return await tc.extractTar(zipPath, outputDir);
-	}
-	else {
-		console.Error('unsupported platform');
-	}
-	return ''
+
+	return await extractor(filepath, outputPath);
 }
 
 async function execApp(filePath, args) {
