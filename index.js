@@ -3,7 +3,8 @@ const tc = require('@actions/tool-cache');
 const toolchain = require('./toolchain');
 const path = require('path');
 const RunnerConfig = require('./runner-config');
-import { getPlatformString, getPlatformArchiveExt } from './platform.js';
+const { getPlatformString, getPlatformArchiveExt } = require('./platform.js');
+//import { getPlatformString, getPlatformArchiveExt } from './platform.js';
 
 function main() {
     try {

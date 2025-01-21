@@ -1,29 +1,27 @@
 
-export function getPlatformString() {
-    if (process.platform === 'win32') {
-        return 'windows';
+function getPlatformString() {
+    switch (process.platform) {
+        case 'win32':
+            return 'windows'
+        case 'darwin':
+            return 'macosx';
+        case 'linux':
+            return 'linux';
     }
-    else if (process.platform === 'darwin') {
-        return 'macosx';
-    }
-    else if (process.platform === 'linux') {
-        return 'linux';
-    }
-    else {
-        console.Error('unsupported platform');
-    }
-    return ''
+
+    throw Error(`unsupported platform: ${process.platform}`);
 }
 
-export function getPlatformArchiveExt() {
-    if (process.platform === 'win32') {
-        return 'zip';
+function getPlatformArchiveExt() {
+    switch (process.platform) {
+        case 'win32':
+            return 'zip';
+        case 'darwin':
+        case 'linux':
+            return 'tar.gz';
     }
-    else if (process.platform === 'darwin' || process.platform === 'linux') {
-        return 'tar.gz';
-    }
-    else {
-        console.Error('unsupported platform');
-    }
-    return ''
+
+    throw Error('unsupported platform: ${process.platform}');
 }
+
+module.exports = { getPlatformString, getPlatformArchiveExt };
