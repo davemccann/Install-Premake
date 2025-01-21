@@ -3,20 +3,19 @@ const path = require('node:path');
 const { execFile } = require('child_process');
 
 const archiveExtractorMappings = {
-    '.zip': tc.extractZip,
-    '.7z': tc.extract7z,
-    '.pkg': tc.extractXar,
-    '.tar': tc.extractTar,
-    '.gz': tc.extractTar,
-    '.tgz': tc.extractTar,
+    'zip': tc.extractZip,
+    '7z': tc.extract7z,
+    'pkg': tc.extractXar,
+    'tar': tc.extractTar,
+    'tar.gz': tc.extractTar,
+    'gz': tc.extractTar,
+    'tgz': tc.extractTar,
 };
 
-async function extractArchive(filepath, outputPath) {
-    const extension = path.extname(filepath);
-
-    const extractor = archiveExtractorMappings[extension];
+async function extractArchive(filepath, outputPath, archiveType) {
+    const extractor = archiveExtractorMappings[archiveType];
     if (!extractor) {
-        throw new Error(`failed to extract archive, unsupported file format: ${extension}`);
+        throw new Error(`failed to extract archive, unsupported file format: ${archiveType}`);
     }
 
     return await extractor(filepath, outputPath);

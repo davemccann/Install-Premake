@@ -26,3 +26,20 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  integration:
+    name: Run Integration Tests
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Premake Version
+        uses: ./
+        with:
+          version: '5.0.0-beta3'
+          action: '--version'

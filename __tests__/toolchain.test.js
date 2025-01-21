@@ -15,21 +15,21 @@ describe('extractArchive', () => {
     });
 
     const archiveTypes = [
-        { type: '.zip', mockResolvedValue: tc.extractZip.mockResolvedValue, expectedCall: tc.extractZip },
-        { type: '.7z', mockResolvedValue: tc.extract7z.mockResolvedValue, expectedCall: tc.extract7z },
-        { type: '.pkg', mockResolvedValue: tc.extractXar.mockResolvedValue, expectedCall: tc.extractXar },
-        { type: '.tar', mockResolvedValue: tc.extractTar.mockResolvedValue, expectedCall: tc.extractTar },
-        { type: '.gz', mockResolvedValue: tc.extractTar.mockResolvedValue, expectedCall: tc.extractTar },
-        { type: '.tgz', mockResolvedValue: tc.extractTar.mockResolvedValue, expectedCall: tc.extractTar },
+        { type: 'zip', mockResolvedValue: tc.extractZip.mockResolvedValue, expectedCall: tc.extractZip },
+        { type: '7z', mockResolvedValue: tc.extract7z.mockResolvedValue, expectedCall: tc.extract7z },
+        { type: 'pkg', mockResolvedValue: tc.extractXar.mockResolvedValue, expectedCall: tc.extractXar },
+        { type: 'tar', mockResolvedValue: tc.extractTar.mockResolvedValue, expectedCall: tc.extractTar },
+        { type: 'gz', mockResolvedValue: tc.extractTar.mockResolvedValue, expectedCall: tc.extractTar },
+        { type: 'tgz', mockResolvedValue: tc.extractTar.mockResolvedValue, expectedCall: tc.extractTar },
     ];
 
     test.each(archiveTypes)('extractArchive ($type)', async ({ type, mockResolvedValue, expectedCall }) => {
-        const archivePath = 'path/to/archive' + type;
+        const archivePath = 'path/to/archive' + `.${type}`;
         const outputDir = 'output/directory';
 
         mockResolvedValue('extracted-path');
 
-        const result = await extractArchive(archivePath, outputDir);
+        const result = await extractArchive(archivePath, outputDir, type);
 
         expect(expectedCall).toHaveBeenCalledWith(archivePath, outputDir);
         expect(result).toBe('extracted-path');
@@ -39,7 +39,7 @@ describe('extractArchive', () => {
         const archivePath = 'path/to/archive.png';
         const outputDir = 'output/directory';
 
-        await expect(extractArchive(archivePath, outputDir))
+        await expect(extractArchive(archivePath, outputDir, 'png'))
             .rejects
             .toThrowError(/unsupported file format/);
     });
