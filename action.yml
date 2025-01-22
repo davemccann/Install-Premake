@@ -1,22 +1,10 @@
-name: 'PremakeCI'
+name: 'Install Premake'
 description: 'Downloads and executes Premake - https://premake.github.io/'
 inputs:
   version:
     description: 'The version of Premake to download. Default: 5.0.0-beta3'
     required: true
-  action:
-    description: 'Performs a built-in action or user defined action - e.g. vs2022 to generate visual studio project files.'
-    required: true
-  options:
-    description: '[Optional] Any command-line options to apply created using the newoption function - e.g. --gfxapi=opengl'
-    default: ''
-  installPath:
-    description: '[Optional] The path to install premake executable to.'
-    default: '.'
-  premakeFilepath:
-    description: '[Optional] The file location of a premake configuration script to use'
-    default: ''
-  
+    default: '5.0.0-beta4'
 runs:
   using: 'node20'
   main: 'dist/index.js'
