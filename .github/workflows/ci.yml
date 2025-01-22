@@ -43,3 +43,5 @@ jobs:
         with:
           version: '5.0.0-beta4'
 
+      - name: Check Premake
+        run: premake5 --version
