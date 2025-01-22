@@ -1,5 +1,54 @@
-//import { getPlatformString } from '../platform.js';
-const { getPlatformString, getPlatformArchiveExt } = require('../platform.js')
+const path = require('path');
+const { generatePremakeURL, getPlatformString, getPlatformArchiveExt } = require('../platform')
+
+describe('generatePremakeURL', () => {
+    test('return URL for win32 platforms', () => {
+        Object.defineProperty(process, 'platform', {
+            value: 'win32'
+        });
+
+        const basePath = 'https://github.com/premake/premake-core/releases/download';
+        const platformPath = 'v5.0.0-beta4/premake-5.0.0-beta4-windows.zip';
+        const expectedCombinedPath = path.join(basePath, platformPath);
+
+        premakeURL = generatePremakeURL('5.0.0-beta4');
+        expect(premakeURL).toBe(expectedCombinedPath);
+    });
+
+    test('return URL for darwin platforms', () => {
+        Object.defineProperty(process, 'platform', {
+            value: 'darwin'
+        });
+
+        const basePath = 'https://github.com/premake/premake-core/releases/download';
+        const platformPath = 'v5.0.0-beta4/premake-5.0.0-beta4-macosx.tar.gz';
+        const expectedCombinedPath = path.join(basePath, platformPath);
+
+        premakeURL = generatePremakeURL('5.0.0-beta4');
+        expect(premakeURL).toBe(expectedCombinedPath);
+    });
+
+    test('return URL for linux platforms', () => {
+        Object.defineProperty(process, 'platform', {
+            value: 'linux'
+        });
+
+        const basePath = 'https://github.com/premake/premake-core/releases/download';
+        const platformPath = 'v5.0.0-beta4/premake-5.0.0-beta4-linux.tar.gz';
+        const expectedCombinedPath = path.join(basePath, platformPath);
+
+        premakeURL = generatePremakeURL('5.0.0-beta4');
+        expect(premakeURL).toBe(expectedCombinedPath);
+    });
+
+    test('return URL for win32 platforms', () => {
+        Object.defineProperty(process, 'platform', {
+            value: 'invalid'
+        });
+
+        expect(() => generatePremakeURL('5.0.0-beta4')).toThrowError(/unsupported platform/);
+    });
+});
 
 describe('getPlatformString', () => {
     test('return "windows" for win32 platforms', () => {

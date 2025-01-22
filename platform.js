@@ -1,3 +1,19 @@
+const path = require('path');
+
+function generatePremakeURL(premakeVersion) {
+    try {
+        platform = getPlatformString();
+        archiveExt = getPlatformArchiveExt();
+
+        const baseURL = `https://github.com/premake/premake-core/releases/download`;
+        const versionTag = `v${premakeVersion}`;
+        const filename = `premake-${premakeVersion}-${platform}.${archiveExt}`;
+
+        return path.join(baseURL, versionTag, filename);
+    } catch (err) {
+        throw err;
+    }
+}
 
 function getPlatformString() {
     switch (process.platform) {
@@ -24,4 +40,4 @@ function getPlatformArchiveExt() {
     throw Error('unsupported platform: ${process.platform}');
 }
 
-module.exports = { getPlatformString, getPlatformArchiveExt };
+module.exports = { generatePremakeURL, getPlatformString, getPlatformArchiveExt };

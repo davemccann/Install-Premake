@@ -1,5 +1,4 @@
 const tc = require('@actions/tool-cache');
-const path = require('node:path');
 const { execFile } = require('child_process');
 
 const archiveExtractorMappings = {
