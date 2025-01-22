@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const toolchain = require('./toolchain');
 const { generatePremakeURL, getPlatformArchiveExt } = require('./platform');
@@ -38,6 +39,8 @@ async function main() {
             cfg.toolname,
             cfg.version
         );
+
+        fs.chmodSync(path.join(cachedPath, targetFilename), 0o755);
         core.addPath(cachedPath);
 
     } catch (error) {

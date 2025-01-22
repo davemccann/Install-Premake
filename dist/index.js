@@ -30395,6 +30395,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(5426);
 const tc = __nccwpck_require__(7966);
 const path = __nccwpck_require__(6928);
+const fs = __nccwpck_require__(9896);
 const { v4: uuidv4 } = __nccwpck_require__(2193);
 const toolchain = __nccwpck_require__(1977);
 const { generatePremakeURL, getPlatformArchiveExt } = __nccwpck_require__(11);
@@ -30432,6 +30433,8 @@ async function main() {
             cfg.toolname,
             cfg.version
         );
+
+        fs.chmodSync(path.join(cachedPath, targetFilename), 0o755);
         core.addPath(cachedPath);
 
     } catch (error) {
