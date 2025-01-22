@@ -28182,6 +28182,21 @@ module.exports = {
 
 /***/ }),
 
+/***/ 2193:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var v1 = __nccwpck_require__(5996);
+var v4 = __nccwpck_require__(967);
+
+var uuid = v4;
+uuid.v1 = v1;
+uuid.v4 = v4;
+
+module.exports = uuid;
+
+
+/***/ }),
+
 /***/ 1232:
 /***/ ((module) => {
 
@@ -28230,6 +28245,122 @@ module.exports = function nodeRNG() {
 
 /***/ }),
 
+/***/ 5996:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var rng = __nccwpck_require__(5300);
+var bytesToUuid = __nccwpck_require__(1232);
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+var _clockseq;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/uuidjs/uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+  if (node == null || clockseq == null) {
+    var seedBytes = rng();
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [
+        seedBytes[0] | 0x01,
+        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+      ];
+    }
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  }
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid(b);
+}
+
+module.exports = v1;
+
+
+/***/ }),
+
 /***/ 967:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -28267,8 +28398,24 @@ module.exports = v4;
 /***/ }),
 
 /***/ 11:
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const path = __nccwpck_require__(6928);
+
+function generatePremakeURL(premakeVersion) {
+    try {
+        platform = getPlatformString();
+        archiveExt = getPlatformArchiveExt();
+
+        const baseURL = `https://github.com/premake/premake-core/releases/download`;
+        const versionTag = `v${premakeVersion}`;
+        const filename = `premake-${premakeVersion}-${platform}.${archiveExt}`;
+
+        return path.join(baseURL, versionTag, filename);
+    } catch (err) {
+        throw err;
+    }
+}
 
 function getPlatformString() {
     switch (process.platform) {
@@ -28295,48 +28442,7 @@ function getPlatformArchiveExt() {
     throw Error('unsupported platform: ${process.platform}');
 }
 
-module.exports = { getPlatformString, getPlatformArchiveExt };
-
-
-/***/ }),
-
-/***/ 9149:
-/***/ ((module) => {
-
-const RunnerConfig = {
-	version: '',
-	action: '',
-	options: [],
-	installPath: '',
-	premakeFilepath: '',
-
-	create: (version, action, options, installPath, premakeFilepath) => {
-		const newCfg = Object.create(RunnerConfig);
-		newCfg.version = version;
-		newCfg.action = action;
-		newCfg.options = options;
-		newCfg.installPath = installPath;
-		newCfg.premakeFilepath = premakeFilepath;
-		return newCfg;
-	},
-
-	printRunnerConfig() {
-		outputStr = `
-Configuration:
-- version:         ${this.version}
-- action:          ${this.action}
-- installPath:     ${this.installPath}
-- premakeFilepath: ${this.premakeFilepath}
-- options:         ${this.options}
-
-`;
-		console.log(outputStr);
-	}
-};
-
-
-
-module.exports = RunnerConfig;
+module.exports = { generatePremakeURL, getPlatformString, getPlatformArchiveExt };
 
 
 /***/ }),
@@ -28345,7 +28451,6 @@ module.exports = RunnerConfig;
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const tc = __nccwpck_require__(7966);
-const path = __nccwpck_require__(6760);
 const { execFile } = __nccwpck_require__(5317);
 
 const archiveExtractorMappings = {
@@ -28492,14 +28597,6 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("node:events");
-
-/***/ }),
-
-/***/ 6760:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:path");
 
 /***/ }),
 
@@ -30297,50 +30394,45 @@ module.exports = parseParams
 var __webpack_exports__ = {};
 const core = __nccwpck_require__(5426);
 const tc = __nccwpck_require__(7966);
-const toolchain = __nccwpck_require__(1977);
 const path = __nccwpck_require__(6928);
-const RunnerConfig = __nccwpck_require__(9149);
-const { getPlatformString, getPlatformArchiveExt } = __nccwpck_require__(11);
+const { v4: uuidv4 } = __nccwpck_require__(2193);
+const toolchain = __nccwpck_require__(1977);
+const { generatePremakeURL, getPlatformArchiveExt } = __nccwpck_require__(11);
 
 async function main() {
     try {
-        cfg = RunnerConfig.create(
-            core.getInput('version', { required: true }),
-            core.getInput('action', { required: true }),
-            core.getInput('options', { required: false }),
-            core.getInput('installPath', { required: false }),
-            core.getInput('premakeFilepath', { required: false })
-        );
-        cfg.printRunnerConfig();
+        cfg = {
+            version: core.getInput('version', { required: true }),
+            toolname: 'premake',
+        };
 
-        const platform = getPlatformString();
+        // Search the cache for the version and use that if exists
+        cachedPath = tc.find(cfg.toolname, cfg.version);
+        if (cachedPath) {
+            core.addPath(cachedPath);
+            process.exit(0);
+        }
+
+        const premakeTempPath = path.join(process.env.RUNNER_TEMP, cfg.toolname);
+
+        // Attempt to download binary with the version specified 
+        const premakeURL = generatePremakeURL(cfg.version);
+        const downloadPath = path.join(premakeTempPath, uuidv4());
+        const premakePath = await tc.downloadTool(premakeURL, downloadPath);
+
+        // Extract the executable from the archive to temp storage
         const archiveExt = getPlatformArchiveExt();
+        const extractFolder = await toolchain.extractArchive(premakePath, premakeTempPath, archiveExt);
 
-        const baseURL = `https://github.com/premake/premake-core/releases/download`;
-        const premakeURL = path.join(baseURL, `v${cfg.version}/premake-${cfg.version}-${platform}.${archiveExt}`);
-
-        // Add this path to the environment for this run
-        core.addPath(cfg.installPath);
-
-        // Attempt to download binary with the version specified
-        console.log("test");
-        const premakePath = await tc.downloadTool(premakeURL);
-        console.log(`premake path: ${premakePath}`);
-
-        // Extract the executable from the archive
-        const extractFolder = await toolchain.extractArchive(premakePath, cfg.installPath, archiveExt);
-
-        // Execute premake and pass in the specified arguments
-        var args = [cfg.action];
-        if (cfg.premakeFilepath !== '') {
-            args.push(`--file=${cfg.premakeFilepath}`);
-        }
-        if (cfg.options !== '') {
-            args.push(cfg.options);
-        }
-
-        console.log(`run ${extractFolder}/premake5 ${args}`);
-        toolchain.execApp(`${extractFolder}/premake5`, args);
+        // Cache the executable by version for next run
+        const targetFilename = process.platform === 'win32' ? 'premake5.exe' : 'premake5';
+        cachedPath = await tc.cacheFile(
+            path.join(extractFolder, targetFilename),
+            targetFilename,
+            cfg.toolname,
+            cfg.version
+        );
+        core.addPath(cachedPath);
 
     } catch (error) {
         console.error(`action failed: ${error.message}`);

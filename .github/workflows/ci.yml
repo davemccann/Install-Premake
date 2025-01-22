@@ -38,8 +38,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Premake Version
+      - name: Install Premake
         uses: ./
         with:
-          version: '5.0.0-beta3'
-          action: '--version'
+          version: '5.0.0-beta4'
+
