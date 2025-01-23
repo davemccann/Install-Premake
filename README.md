@@ -1,27 +1,31 @@
+[![CI](https://github.com/davemccann/Install-Premake/actions/workflows/ci.yml/badge.svg)](https://github.com/davemccann/Install-Premake/actions/workflows/ci.yml)
+
 # PremakeCI
 
-This action performs the setup and calling of [Premake](https://github.com/premake/premake-core/) on the host-runner. It downloads and installs Premake based on the configured version and sets up the environment prior to executing a premake configuration file.
+This action performs the installation of [Premake](https://github.com/premake/premake-core/) on the host-runner. The artifact is downloaded to the runners temp directory and extracted to the tool-cache directory ready for use. For self-hosted runners, the script will attempt to find a cached version before attempting to download. The tool install location will be added to the PATH.
 
 ## Usage
 
 ```yaml
-- uses: davemccann/PremakeCI@v0.3.1
-  with:
-    version: '5.0.0-beta3'
-    action: vs2022
-    options: --gfxapi=opengl
-    installPath: './myInstallDirectory'
-    premakeFilepath: './test'
+steps:
+  - name: Install Premake
+    uses: davemccann/Install-Premake@v1.0.0
+    with:
+      version: '5.0.0-beta4'
+
+  - name: Check Premake
+    run: premake5 --version
 ```
 ## Configuration
 
 ### Options
 
-- `version`: **Required** Premake version to use, must be a version from the tagged release [page](https://github.com/premake/premake-core/tags)
-- `action`: **Required** Premake action to use, either custom or one of the out of the box solution - See [Using Premake](https://premake.github.io/docs/Using-Premake)
-- `options`: *Optional* Any optional arguments to be used for modifying behavior of the action - See [Command Line Arguments](https://premake.github.io/docs/Command-Line-Arguments)
-- `installPath`: *Optional* The destination path to install premake (default `'.'`)
-- `premakeFilepath`: *Optional* The filepath to the premake configuration file for the project, otherwise will use the `premake5.lua` located in ${{ github.workspace }}
+- `version`: Premake version to use, must be a version from the tagged release [page](https://github.com/premake/premake-core/tags) `default: 5.0.0-beta4`
+
+### Environment Variables
+
+- `RUNNER_TEMP`: The temporary download location for the newly downloaded artifact.
+- `RUNNER_TOOL_CACHE`: The final install directory for the extracted tool.
 
 ## Troubleshooting
 
