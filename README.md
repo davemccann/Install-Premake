@@ -1,6 +1,6 @@
 [![CI](https://github.com/davemccann/Install-Premake/actions/workflows/ci.yml/badge.svg)](https://github.com/davemccann/Install-Premake/actions/workflows/ci.yml)
 
-# PremakeCI
+# Install Premake Action
 
 This action performs the installation of [Premake](https://github.com/premake/premake-core/) on the host-runner. The artifact is downloaded to the runners temp directory and extracted to the tool-cache directory ready for use. For self-hosted runners, the script will attempt to find a cached version before attempting to download. The tool install location will be added to the PATH.
 
