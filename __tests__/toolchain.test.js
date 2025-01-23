@@ -1,6 +1,6 @@
 const tc = require('@actions/tool-cache');
 const { execFile } = require('child_process');
-const { extractArchive, execApp } = require('../toolchain.js');
+const { extractArchive, execApp } = require('../src/toolchain.js');
 
 jest.mock('@actions/tool-cache', () => ({
     extractZip: jest.fn(),

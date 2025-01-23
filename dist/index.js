@@ -28397,7 +28397,7 @@ module.exports = v4;
 
 /***/ }),
 
-/***/ 11:
+/***/ 3232:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const path = __nccwpck_require__(6928);
@@ -28447,7 +28447,7 @@ module.exports = { generatePremakeURL, getPlatformString, getPlatformArchiveExt 
 
 /***/ }),
 
-/***/ 1977:
+/***/ 2844:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const tc = __nccwpck_require__(7966);
@@ -30397,8 +30397,8 @@ const tc = __nccwpck_require__(7966);
 const path = __nccwpck_require__(6928);
 const fs = __nccwpck_require__(9896);
 const { v4: uuidv4 } = __nccwpck_require__(2193);
-const toolchain = __nccwpck_require__(1977);
-const { generatePremakeURL, getPlatformArchiveExt } = __nccwpck_require__(11);
+const toolchain = __nccwpck_require__(2844);
+const { generatePremakeURL, getPlatformArchiveExt } = __nccwpck_require__(3232);
 
 async function main() {
     try {

@@ -1,5 +1,5 @@
 const path = require('path');
-const { generatePremakeURL, getPlatformString, getPlatformArchiveExt } = require('../platform')
+const { generatePremakeURL, getPlatformString, getPlatformArchiveExt } = require('../src/platform')
 
 describe('generatePremakeURL', () => {
     test('return URL for win32 platforms', () => {
